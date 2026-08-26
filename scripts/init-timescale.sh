@@ -12,7 +12,8 @@ DB_NAME="${HINDSIGHT_DB_NAME:-hindsight_db}"
 PSQL=(
   psql
   --no-psqlrc
-  --set=ON_ERROR_STOP=1
+  -v
+  ON_ERROR_STOP=1
   -h "$DB_HOST"
   -p "$DB_PORT"
   -U "$DB_USER"
@@ -40,7 +41,7 @@ echo "PostgreSQL is ready"
 database_exists="$(
   "${PSQL[@]}" \
     -d postgres \
-    --set=target_db="$DB_NAME" \
+    -v "target_db=$DB_NAME" \
     -Atqc "SELECT 1 FROM pg_database WHERE datname = :'target_db'"
 )"
 
@@ -48,7 +49,7 @@ if [[ "$database_exists" != "1" ]]; then
   echo "Creating database ${DB_NAME}..."
   "${PSQL[@]}" \
     -d postgres \
-    --set=target_db="$DB_NAME" \
+    -v "target_db=$DB_NAME" \
     -c 'CREATE DATABASE :"target_db";'
 else
   echo "Database ${DB_NAME} already exists"
