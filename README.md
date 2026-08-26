@@ -71,6 +71,10 @@ Then create `~/.hindsight/coding-agent.json` on each developer machine:
 }
 ```
 
+If REST API authentication is enabled, also add
+`"apiToken": "<HINDSIGHT_API_TENANT_API_KEY>"`. The direct remote MCP
+token is a separate option; see the detailed integration guide.
+
 Replace the API domain and bank ID as needed. See
 [CODING_AGENT_INTEGRATION.md](CODING_AGENT_INTEGRATION.md) for configuration,
 path opt-in, migration, and troubleshooting details.
@@ -100,6 +104,9 @@ The `hindsight` service waits for `db` to become healthy and for `timescale-init
 | `HINDSIGHT_API_LLM_BASE_URL` | — | OpenAI-compatible LLM API base URL |
 | `HINDSIGHT_API_LLM_API_KEY` | — | LLM API key |
 | `HINDSIGHT_API_LLM_MODEL` | `deepseek-v4-flash` | LLM model name |
+| `HINDSIGHT_API_TENANT_EXTENSION` | — | Optional REST API authentication extension |
+| `HINDSIGHT_API_TENANT_API_KEY` | — | Optional REST API Bearer token for coding-agent hooks |
+| `HINDSIGHT_API_MCP_AUTH_TOKEN` | — | Optional Bearer token for direct remote MCP clients |
 | `HINDSIGHT_EMBEDDING_MODEL` | `BAAI/bge-m3` | Local embedding model |
 | `HINDSIGHT_RERANKER_MODEL` | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | Local reranker model |
 | `HINDSIGHT_CPU_LIMIT` | `4.0` | Hindsight container CPU limit |
