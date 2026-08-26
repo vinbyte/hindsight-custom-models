@@ -53,3 +53,7 @@ RUN apt-get purge -y --auto-remove git cmake curl && \
 
 # Ensure extensions are preloaded (pg_textsearch requires preloading)
 RUN echo "shared_preload_libraries = 'pg_textsearch'" >> /usr/share/postgresql/postgresql.conf.sample
+
+# Reusable, idempotent initialization script for the one-shot init service.
+COPY scripts/init-timescale.sh /usr/local/bin/init-timescale.sh
+RUN chmod +x /usr/local/bin/init-timescale.sh

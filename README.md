@@ -63,6 +63,8 @@ Setelah container siap, Hindsight tersedia di:
 
 `hindsight` menunggu `db` sehat dan `timescale-init` selesai sebelum dijalankan.
 
+`timescale-init` aman dijalankan ulang: script menunggu koneksi PostgreSQL, hanya membuat database jika belum ada, dan menggunakan `CREATE EXTENSION IF NOT EXISTS` untuk setiap extension.
+
 ## Konfigurasi penting
 
 | Variable | Default | Keterangan |
