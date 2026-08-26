@@ -1,31 +1,31 @@
 # Hindsight Custom Models
 
-Konfigurasi Docker Compose untuk menjalankan [Hindsight](https://github.com/vectorize-io/hindsight) dengan PostgreSQL 17, Timescale extensions, embedding model lokal, dan reranker lokal.
+Docker Compose configuration for running [Hindsight](https://github.com/vectorize-io/hindsight) with PostgreSQL 17, Timescale extensions, a local embedding model, and a local reranker.
 
-## Fitur
+## Features
 
-- PostgreSQL 17 dengan `pgvector`, `pgvectorscale`, dan `pg_textsearch`.
-- Embedding dan reranker diunduh saat image dibangun, lalu digunakan secara offline saat runtime.
-- LLM memakai endpoint OpenAI-compatible, misalnya DeepSeek, OpenRouter, Groq, Ollama, atau LM Studio.
-- Data PostgreSQL disimpan di Docker volume `pg_data`.
-- HTTP API dan gRPC Hindsight diekspos melalui port yang dapat dikonfigurasi.
+- PostgreSQL 17 with `pgvector`, `pgvectorscale`, and `pg_textsearch`.
+- Embedding and reranker models are downloaded during the image build and used offline at runtime.
+- The LLM uses an OpenAI-compatible endpoint such as DeepSeek, OpenRouter, Groq, Ollama, or LM Studio.
+- PostgreSQL data is persisted in the Docker volume `pg_data`.
+- Hindsight HTTP API and gRPC endpoints are exposed on configurable ports.
 
-## Prasyarat
+## Prerequisites
 
-- Docker Engine dengan Docker Compose v2.
-- Akses internet saat image pertama kali dibangun untuk mengunduh base image, dependency, dan model Hugging Face.
-- API key untuk provider LLM yang dipilih, kecuali menggunakan LLM lokal.
-- CPU dan disk yang cukup untuk PostgreSQL, embedding model, serta reranker.
+- Docker Engine with Docker Compose v2.
+- Internet access during the initial image build to download the base image, dependencies, and Hugging Face models.
+- An API key for the selected LLM provider, unless you use a local LLM.
+- Sufficient CPU and disk capacity for PostgreSQL, the embedding model, and the reranker.
 
-## Mulai cepat
+## Quick start
 
-1. Salin konfigurasi environment:
+1. Copy the environment configuration:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Edit `.env`, terutama konfigurasi LLM:
+2. Edit `.env`, especially the LLM configuration:
 
    ```dotenv
    HINDSIGHT_API_LLM_BASE_URL=https://api.deepseek.com
@@ -33,61 +33,63 @@ Konfigurasi Docker Compose untuk menjalankan [Hindsight](https://github.com/vect
    HINDSIGHT_API_LLM_MODEL=deepseek-v4-flash
    ```
 
-3. Build dan jalankan seluruh service:
+3. Build and start all services:
 
    ```bash
    docker compose up -d --build
    ```
 
-   Build pertama dapat berlangsung cukup lama karena dependency Python dan model lokal diunduh ke dalam image.
+   The first build may take some time because Python dependencies and local models are downloaded into the image.
 
-4. Periksa status service:
+4. Check the service status:
 
    ```bash
    docker compose ps
    docker compose logs -f hindsight
    ```
 
-Setelah container siap, Hindsight tersedia di:
+Once the containers are ready, Hindsight is available at:
 
 - HTTP: `http://localhost:8888`
 - gRPC: `localhost:9999`
 
 ## Service
 
-| Service | Peran |
+| Service | Role |
 | --- | --- |
-| `db` | PostgreSQL 17 dengan extension vector dan text search |
-| `timescale-init` | Menyiapkan database dan extension Timescale saat startup |
-| `hindsight` | Menjalankan Hindsight API dengan model lokal |
+| `db` | PostgreSQL 17 with vector and text search extensions |
+| `timescale-init` | Prepares the database and Timescale extensions at startup |
+| `hindsight` | Runs the Hindsight API with local models |
 
-`hindsight` menunggu `db` sehat dan `timescale-init` selesai sebelum dijalankan.
+The `hindsight` service waits for `db` to become healthy and for `timescale-init` to complete before starting.
 
-`timescale-init` aman dijalankan ulang: script menunggu koneksi PostgreSQL, hanya membuat database jika belum ada, dan menggunakan `CREATE EXTENSION IF NOT EXISTS` untuk setiap extension.
+`timescale-init` is safe to run again: the script waits for PostgreSQL, creates the database only if it does not exist, and uses `CREATE EXTENSION IF NOT EXISTS` for each extension.
 
-## Konfigurasi penting
+## Key configuration
 
-| Variable | Default | Keterangan |
+| Variable | Default | Description |
 | --- | --- | --- |
-| `HINDSIGHT_DB_USER` | `hindsight_user` | User PostgreSQL |
-| `HINDSIGHT_DB_PASSWORD` | — | Password PostgreSQL; ganti sebelum deployment |
-| `HINDSIGHT_DB_NAME` | `hindsight_db` | Nama database |
-| `HINDSIGHT_DB_PORT` | `5438` | Port PostgreSQL pada host |
-| `HINDSIGHT_HTTP_PORT` | `8888` | Port HTTP pada host |
-| `HINDSIGHT_GRPC_PORT` | `9999` | Port gRPC pada host |
-| `HINDSIGHT_API_LLM_BASE_URL` | — | Base URL API LLM OpenAI-compatible |
-| `HINDSIGHT_API_LLM_API_KEY` | — | API key LLM |
-| `HINDSIGHT_API_LLM_MODEL` | `deepseek-v4-flash` | Nama model LLM |
-| `HINDSIGHT_EMBEDDING_MODEL` | `microsoft/harrier-oss-v1-0.6b` | Model embedding lokal |
-| `HINDSIGHT_RERANKER_MODEL` | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | Model reranker lokal |
-| `HINDSIGHT_CPU_LIMIT` | `4.0` | Batas CPU container Hindsight |
-| `HINDSIGHT_OMP_NUM_THREADS` | `4` | Jumlah thread model lokal |
+| `HINDSIGHT_DB_USER` | `hindsight_user` | PostgreSQL user |
+| `HINDSIGHT_DB_PASSWORD` | — | PostgreSQL password; change before deployment |
+| `HINDSIGHT_DB_NAME` | `hindsight_db` | Database name |
+| `HINDSIGHT_DB_PORT` | `5438` | PostgreSQL port on the host |
+| `HINDSIGHT_HTTP_PORT` | `8888` | HTTP port on the host |
+| `HINDSIGHT_GRPC_PORT` | `9999` | gRPC port on the host |
+| `HINDSIGHT_API_LLM_BASE_URL` | — | OpenAI-compatible LLM API base URL |
+| `HINDSIGHT_API_LLM_API_KEY` | — | LLM API key |
+| `HINDSIGHT_API_LLM_MODEL` | `deepseek-v4-flash` | LLM model name |
+| `HINDSIGHT_EMBEDDING_MODEL` | `BAAI/bge-m3` | Local embedding model |
+| `HINDSIGHT_RERANKER_MODEL` | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | Local reranker model |
+| `HINDSIGHT_API_MCP_AUTH_TOKEN` | — | Required Bearer token for the coding-agent MCP endpoint |
+| `HINDSIGHT_API_MCP_ENABLED_TOOLS` | `recall,retain,reflect` | Allowlist of MCP tools exposed to agents |
+| `HINDSIGHT_CPU_LIMIT` | `4.0` | Hindsight container CPU limit |
+| `HINDSIGHT_OMP_NUM_THREADS` | `4` | Number of local-model threads |
 
-Jika password database mengandung karakter khusus seperti `#`, `@`, `:`, atau `/`, URL-encode karakter tersebut ketika mengisi `HINDSIGHT_DATABASE_URL`. Contoh tersedia di `.env.example`.
+If the database password contains special characters such as `#`, `@`, `:`, or `/`, URL-encode them when setting `HINDSIGHT_DATABASE_URL`. An example is available in `.env.example`.
 
-## Mengganti model lokal
+## Changing local models
 
-Atur model di `.env`, kemudian build ulang image:
+Set the models in `.env`, then rebuild the image:
 
 ```dotenv
 HINDSIGHT_EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
@@ -99,41 +101,41 @@ docker compose build --no-cache hindsight
 docker compose up -d
 ```
 
-Model harus dapat diunduh saat proses build. Container Hindsight dikonfigurasi dengan `HF_HUB_OFFLINE=1` dan `TRANSFORMERS_OFFLINE=1`, sehingga model yang tidak tersedia di image akan menyebabkan startup gagal.
+The models must be downloadable during the build. The Hindsight container is configured with `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1`, so startup fails if a model is not available in the image.
 
-## Perintah operasional
+## Operational commands
 
 ```bash
-# Melihat status
+# Show status
 docker compose ps
 
-# Mengikuti seluruh log
+# Follow all logs
 docker compose logs -f
 
 # Restart Hindsight
 docker compose restart hindsight
 
-# Menghentikan container tanpa menghapus data
+# Stop containers without removing data
 docker compose down
 ```
 
-Untuk menghapus container sekaligus data PostgreSQL, jalankan perintah berikut dengan hati-hati:
+To remove the containers and PostgreSQL data, run the following command with caution:
 
 ```bash
 docker compose down -v
 ```
 
-## Struktur file
+## File structure
 
 ```text
 .
-├── docker-compose.yaml   # Orkestrasi database, init, dan Hindsight
-├── Dockerfile.db         # PostgreSQL 17 + extension Timescale
-├── Dockerfile.hindsight  # Hindsight + model lokal
-├── .env.example          # Template konfigurasi
+├── docker-compose.yaml   # Database, initialization, and Hindsight orchestration
+├── Dockerfile.db         # PostgreSQL 17 + Timescale extensions
+├── Dockerfile.hindsight  # Hindsight + local models
+├── .env.example          # Configuration template
 └── LICENSE               # MIT License
 ```
 
-## Lisensi
+## License
 
-Proyek ini menggunakan [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
