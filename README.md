@@ -53,6 +53,28 @@ Once the containers are ready, Hindsight is available at:
 - HTTP: `http://localhost:8888`
 - gRPC: `localhost:9999`
 
+## Coding agents
+
+Install the unified integration for all detected coding agents, including
+Claude Code, Codex, OpenCode, Antigravity, Cursor, and Copilot:
+
+```bash
+npx @vectorize-io/hindsight-coding-agents install all --server self-hosted --api-url https://<HINDSIGHT_API_DOMAIN>
+```
+
+Then create `~/.hindsight/coding-agent.json` on each developer machine:
+
+```json
+{
+  "apiUrl": "https://<HINDSIGHT_API_DOMAIN>",
+  "bankId": "hive-mind"
+}
+```
+
+Replace the API domain and bank ID as needed. See
+[CODING_AGENT_INTEGRATION.md](CODING_AGENT_INTEGRATION.md) for configuration,
+path opt-in, migration, and troubleshooting details.
+
 ## Service
 
 | Service | Role |
@@ -80,8 +102,6 @@ The `hindsight` service waits for `db` to become healthy and for `timescale-init
 | `HINDSIGHT_API_LLM_MODEL` | `deepseek-v4-flash` | LLM model name |
 | `HINDSIGHT_EMBEDDING_MODEL` | `BAAI/bge-m3` | Local embedding model |
 | `HINDSIGHT_RERANKER_MODEL` | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | Local reranker model |
-| `HINDSIGHT_API_MCP_AUTH_TOKEN` | — | Required Bearer token for the coding-agent MCP endpoint |
-| `HINDSIGHT_API_MCP_ENABLED_TOOLS` | `recall,retain,reflect` | Allowlist of MCP tools exposed to agents |
 | `HINDSIGHT_CPU_LIMIT` | `4.0` | Hindsight container CPU limit |
 | `HINDSIGHT_OMP_NUM_THREADS` | `4` | Number of local-model threads |
 
