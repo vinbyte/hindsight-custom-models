@@ -42,15 +42,18 @@ database_exists="$(
   "${PSQL[@]}" \
     -d postgres \
     -v "target_db=$DB_NAME" \
-    -Atqc "SELECT 1 FROM pg_database WHERE datname = :'target_db'"
+    -Atq <<'SQL'
+SELECT 1 FROM pg_database WHERE datname = :'target_db';
+SQL
 )"
 
 if [[ "$database_exists" != "1" ]]; then
   echo "Creating database ${DB_NAME}..."
   "${PSQL[@]}" \
     -d postgres \
-    -v "target_db=$DB_NAME" \
-    -c 'CREATE DATABASE :"target_db";'
+    -v "target_db=$DB_NAME" <<'SQL'
+CREATE DATABASE :"target_db";
+SQL
 else
   echo "Database ${DB_NAME} already exists"
 fi
