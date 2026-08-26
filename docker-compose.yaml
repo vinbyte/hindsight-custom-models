@@ -67,6 +67,12 @@ services:
       HINDSIGHT_API_LLM_BASE_URL: ${HINDSIGHT_API_LLM_BASE_URL}
       HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_API_LLM_MODEL:-deepseek-v4-flash}
 
+      # ── MCP for coding agents ──
+      # Keep the token out of git. It is required before Compose will start.
+      HINDSIGHT_API_MCP_ENABLED: ${HINDSIGHT_API_MCP_ENABLED:-true}
+      HINDSIGHT_API_MCP_AUTH_TOKEN: ${HINDSIGHT_API_MCP_AUTH_TOKEN:?Set HINDSIGHT_API_MCP_AUTH_TOKEN to a long random secret}
+      HINDSIGHT_API_MCP_ENABLED_TOOLS: ${HINDSIGHT_API_MCP_ENABLED_TOOLS:-recall,retain,reflect}
+
       # ── Local embeddings & reranker ──
       HINDSIGHT_API_EMBEDDINGS_PROVIDER: local
       HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL: ${HINDSIGHT_EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
