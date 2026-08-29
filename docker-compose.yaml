@@ -76,6 +76,13 @@ services:
       HINDSIGHT_API_MCP_AUTH_TOKEN: ${HINDSIGHT_API_MCP_AUTH_TOKEN:-}
       HINDSIGHT_API_MCP_ENABLED_TOOLS: ${HINDSIGHT_API_MCP_ENABLED_TOOLS:-recall,retain,reflect}
 
+      # ── Control Plane (served by the same Hindsight image on port 9999) ──
+      # The Control Plane needs its own UI access key and, when API auth is
+      # enabled above, the bearer token it uses for requests to this API.
+      HINDSIGHT_CP_ACCESS_KEY: ${HINDSIGHT_CP_ACCESS_KEY:-}
+      HINDSIGHT_CP_DATAPLANE_API_URL: ${HINDSIGHT_CP_DATAPLANE_API_URL:-http://localhost:8888}
+      HINDSIGHT_CP_DATAPLANE_API_KEY: ${HINDSIGHT_CP_DATAPLANE_API_KEY:-}
+
       # ── Local embeddings & reranker ──
       HINDSIGHT_API_EMBEDDINGS_PROVIDER: local
       HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL: ${HINDSIGHT_EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
