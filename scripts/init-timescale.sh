@@ -21,7 +21,7 @@ PSQL=(
 
 echo "Waiting for PostgreSQL at ${DB_HOST}:${DB_PORT}..."
 for attempt in {1..30}; do
-  if pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" >/dev/null 2>&1 \
+  if pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1 \
     && "${PSQL[@]}" -d postgres -Atqc 'SELECT 1' >/dev/null 2>&1; then
     break
   fi
