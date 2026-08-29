@@ -67,6 +67,10 @@ services:
       HINDSIGHT_API_LLM_BASE_URL: ${HINDSIGHT_API_LLM_BASE_URL}
       HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_API_LLM_MODEL:-deepseek-v4-flash}
 
+      # ── Retain tuning ──
+      # Keep this within the output-token limit of the configured LLM.
+      HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS: ${HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS:-64000}
+
       # ── REST API authentication for coding-agent hooks ──
       HINDSIGHT_API_TENANT_EXTENSION: ${HINDSIGHT_API_TENANT_EXTENSION:-}
       HINDSIGHT_API_TENANT_API_KEY: ${HINDSIGHT_API_TENANT_API_KEY:-}
