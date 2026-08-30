@@ -7,17 +7,20 @@
 #
 # Built on top of the slim image so only the deps and models you actually
 # use end up in the final image.
-FROM ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION:-latest-slim}
+ARG HINDSIGHT_VERSION=latest-slim
+FROM ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION}
 
 # Optional Codex CLI support for the docker-compose.codex.yaml overlay. Keeping
 # it behind a build argument leaves the base image unchanged for other LLMs.
 ARG INSTALL_CODEX=false
+USER root
 RUN if [ "$INSTALL_CODEX" = "true" ]; then \
       apt-get update \
       && apt-get install -y --no-install-recommends nodejs npm \
       && npm install --global @openai/codex \
       && rm -rf /var/lib/apt/lists/*; \
     fi
+USER 1000
 
 # Install the local-ml deps required to load sentence-transformers /
 # cross-encoder models at runtime.
