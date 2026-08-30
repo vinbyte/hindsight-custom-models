@@ -28,8 +28,11 @@ RUN if [ "$INSTALL_CODEX" = "true" ]; then \
 USER 1000
 
 # Install the local-ml deps required to load sentence-transformers /
-# cross-encoder models at runtime.
+# cross-encoder models at runtime. PyTorch's CPU index takes priority over
+# PyPI, preventing CUDA/NVIDIA wheels from being downloaded on CPU servers.
+ARG PYTORCH_CPU_INDEX=https://download.pytorch.org/whl/cpu
 RUN uv pip install --python /app/api/.venv/bin/python --no-cache \
+    --extra-index-url "${PYTORCH_CPU_INDEX}" \
     'sentence-transformers>=5.0.0' \
     'transformers>=4.53.0' \
     'torch>=2.6.0'
