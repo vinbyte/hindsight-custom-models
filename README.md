@@ -53,6 +53,33 @@ Once the containers are ready, Hindsight is available at:
 - HTTP: `http://localhost:8888`
 - gRPC: `localhost:9999`
 
+## Optional: Codex OAuth LLM overlay
+
+The base Compose file remains provider-neutral. To use a ChatGPT Plus/Pro
+subscription for Hindsight's internal LLM operations, create a dedicated Docker
+volume for its Codex credential. Do not mount your normal `~/.codex` directory:
+the long-running service must not share refresh tokens with interactive Codex.
+
+```bash
+docker volume create hindsight-codex-auth
+docker run --rm -it \
+  -e CODEX_HOME=/codex \
+  -v hindsight-codex-auth:/codex \
+  node:22-bookworm \
+  sh -lc 'npx -y @openai/codex login --device-auth && test -f /codex/auth.json && chown -R 1000:1000 /codex'
+```
+
+Start with the additive overlay:
+
+```bash
+docker compose -f docker-compose.yaml -f docker-compose.codex.yaml up -d --build
+```
+
+It uses Luna for frequent retain work and Terra for reflect and consolidation.
+Copy `.env.codex.example` values into `.env` only when you need to override
+those defaults. Removing the second `-f` returns to the existing provider
+configuration without editing it.
+
 ## Coding agents
 
 Install the unified integration for all detected coding agents, including

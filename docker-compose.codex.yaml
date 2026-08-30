@@ -1,0 +1,44 @@
+# Optional overlay: run Hindsight's internal LLM work through a dedicated
+# ChatGPT Plus/Pro Codex OAuth login. It intentionally does not modify the
+# existing provider settings in docker-compose.yaml or .env.
+#
+# Start with:
+#   docker compose -f docker-compose.yaml -f docker-compose.codex.yaml up -d --build
+
+services:
+  hindsight:
+    build:
+      args:
+        INSTALL_CODEX: "true"
+    restart: unless-stopped
+    init: true
+    environment:
+      # Isolate service auth from the interactive Codex CLI on the host.
+      CODEX_HOME: /codex
+
+      # No Platform API key is required for this provider.
+      HINDSIGHT_API_LLM_PROVIDER: openai-codex
+      HINDSIGHT_API_LLM_API_KEY: ""
+      HINDSIGHT_API_LLM_BASE_URL: ""
+
+      # Fallback plus per-operation model lanes.
+      HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_CODEX_LLM_MODEL:-gpt-5.6-terra}
+      HINDSIGHT_API_RETAIN_LLM_MODEL: ${HINDSIGHT_CODEX_RETAIN_MODEL:-gpt-5.6-luna}
+      HINDSIGHT_API_REFLECT_LLM_MODEL: ${HINDSIGHT_CODEX_REFLECT_MODEL:-gpt-5.6-terra}
+      HINDSIGHT_API_CONSOLIDATION_LLM_MODEL: ${HINDSIGHT_CODEX_CONSOLIDATION_MODEL:-gpt-5.6-terra}
+
+      # Reserve capacity for reflect while retain and consolidation run.
+      HINDSIGHT_API_LLM_MAX_CONCURRENT: ${HINDSIGHT_CODEX_MAX_CONCURRENT:-3}
+      HINDSIGHT_API_RETAIN_LLM_MAX_CONCURRENT: ${HINDSIGHT_CODEX_RETAIN_MAX_CONCURRENT:-1}
+      HINDSIGHT_API_REFLECT_LLM_MAX_CONCURRENT: ${HINDSIGHT_CODEX_REFLECT_MAX_CONCURRENT:-1}
+      HINDSIGHT_API_CONSOLIDATION_LLM_MAX_CONCURRENT: ${HINDSIGHT_CODEX_CONSOLIDATION_MAX_CONCURRENT:-1}
+      HINDSIGHT_API_LLM_TIMEOUT: ${HINDSIGHT_CODEX_TIMEOUT:-300}
+      HINDSIGHT_API_LLM_MAX_RETRIES: ${HINDSIGHT_CODEX_MAX_RETRIES:-5}
+      HINDSIGHT_API_LLM_INITIAL_BACKOFF: ${HINDSIGHT_CODEX_INITIAL_BACKOFF:-2}
+      HINDSIGHT_API_LLM_MAX_BACKOFF: ${HINDSIGHT_CODEX_MAX_BACKOFF:-60}
+      HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS: ${HINDSIGHT_CODEX_RETAIN_MAX_COMPLETION_TOKENS:-48000}
+    volumes:
+      - hindsight-codex-auth:/codex
+
+volumes:
+  hindsight-codex-auth:
