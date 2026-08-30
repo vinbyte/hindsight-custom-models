@@ -56,18 +56,18 @@ Once the containers are ready, Hindsight is available at:
 ## Optional: Codex OAuth LLM overlay
 
 The base Compose file remains provider-neutral. To use a ChatGPT Plus/Pro
-subscription for Hindsight's internal LLM operations, create a dedicated Docker
-volume for its Codex credential. Do not mount your normal `~/.codex` directory:
-the long-running service must not share refresh tokens with interactive Codex.
+subscription for Hindsight's internal LLM operations, create a dedicated Codex
+credential through Compose. Do not mount your normal `~/.codex` directory: the
+long-running service must not share refresh tokens with interactive Codex.
 
 ```bash
-docker volume create hindsight-codex-auth
-docker run --rm -it \
-  -e CODEX_HOME=/codex \
-  -v hindsight-codex-auth:/codex \
-  node:22-bookworm \
-  sh -lc 'npx -y @openai/codex login --device-auth && test -f /codex/auth.json && chown -R 1000:1000 /codex'
+docker compose -f docker-compose.yaml -f docker-compose.codex.yaml \
+  run --rm --no-deps --user root --entrypoint sh hindsight \
+  -lc 'codex login --device-auth && chown -R 1000:1000 /codex'
 ```
+
+This uses the exact Compose-managed `hindsight-codex-auth` volume that the
+running service mounts, regardless of the Compose project name.
 
 Start with the additive overlay:
 
