@@ -37,13 +37,13 @@ RUN uv pip install --python /app/api/.venv/bin/python --no-cache \
     'flashrank>=0.2.10'
 
 # Pre-download the models you want to use. Override via build args.
-ARG EMBEDDER=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
-ARG RERANKER=ms-marco-MultiBERT-L-12
+ARG HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+ARG HINDSIGHT_API_RERANKER_FLASHRANK_MODEL=ms-marco-MultiBERT-L-12
 ENV HINDSIGHT_API_RERANKER_FLASHRANK_CACHE_DIR=/home/hindsight/.cache/flashrank
 ENV HF_HUB_DOWNLOAD_TIMEOUT=600
 RUN mkdir -p /home/hindsight/.cache/flashrank && \
     /app/api/.venv/bin/python -c "\
 from sentence_transformers import SentenceTransformer; \
 from flashrank import Ranker; \
-SentenceTransformer('${EMBEDDER}'); \
-Ranker(model_name='${RERANKER}', cache_dir='/home/hindsight/.cache/flashrank')"
+SentenceTransformer('${HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL}'); \
+Ranker(model_name='${HINDSIGHT_API_RERANKER_FLASHRANK_MODEL}', cache_dir='/home/hindsight/.cache/flashrank')"
