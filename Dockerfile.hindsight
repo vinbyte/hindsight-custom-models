@@ -14,7 +14,7 @@ FROM ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION}
 # it behind a build argument leaves the base image unchanged for other LLMs.
 ARG INSTALL_CODEX=false
 USER root
-ENV PATH="/usr/local/bin:/usr/bin:/bin:${PATH}"
+ENV PATH="/app/api/.venv/bin:/usr/local/bin:/usr/bin:/bin:${PATH}"
 RUN if [ "$INSTALL_CODEX" = "true" ]; then \
       apt-get update \
       && apt-get install -y --no-install-recommends nodejs \
